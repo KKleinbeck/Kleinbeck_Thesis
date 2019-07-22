@@ -1,0 +1,314 @@
+%=================================================================
+%=================================================================
+%       ENVIRONMENT & STYLES
+%=================================================================
+%=================================================================
+
+%-----------------------------------------------------------------
+%	Style-Specific Font
+%-----------------------------------------------------------------
+
+\RequirePackage{fontspec}
+\newfontfamily\stuttgartfamily[Extension = .ttf,
+	Ligatures                            = TeX,
+	BoldFont                             = {Univers-Bold},
+	SmallCapsFont                        = {Univers-Light}]{Univers-Regular}
+
+\newfontfamily\titlefamily[Extension = .ttf,
+	Ligatures                        = TeX,
+	BoldFont                         = {Martel-DemiBold},
+	SmallCapsFont                    = {Martel-Light}]{Martel-Regular}
+
+\setkomafont{pagehead}{\stuttgartfamily\scshape\small}
+	
+%-----------------------------------------------------------------
+%	Plotting + Colors
+%-----------------------------------------------------------------
+
+\definecolor{plotcol1}    {HTML/cmyk}{58B5AA/0.51,0.00,0.06,0.29}
+\definecolor{plotcol2}    {HTML/cmyk}{F9AF86/0.00,0.29,0.46,0.02}
+\definecolor{plotcol3}    {HTML/cmyk}{FF7A7A/0.00,0.52,0.52,0.00}
+\definecolor{plotcol4}    {HTML/cmyk}{AB2098/0.00,0.81,0.11,0.32}
+\definecolor{plotcol5}    {HTML/cmyk}{333ABF/0.73,0.69,0.00,0.25}
+
+\definecolor{stuttgart1}  {HTML/cmyk}{323232/0.50,0.35,0.25,0.70}
+\definecolor{stuttgart2}  {HTML/cmyk}{004191/1.00,0.70,0.00,0.00}
+\definecolor{stuttgart3}  {HTML/cmyk}{00BEFF/0.70,0.00,0.00,0.00}
+
+\RequirePackage{pgfplots}
+	\usepgfplotslibrary{colorbrewer}
+
+\pgfplotsset%
+{%
+	colormap={stuttgart}%
+	{%
+		color(0cm) =(stuttgart1);%
+		color(1cm) =(stuttgart2);%
+		color(4cm) =(stuttgart3);%
+		rgb255(7cm)=(255,255,255);%
+	},%
+%
+	colormap name=stuttgart,
+}
+
+
+%-----------------------------------------------------------------
+%	Chapter + Sections
+%-----------------------------------------------------------------
+
+\RequirePackage{ragged2e}
+\RequirePackage{anyfontsize}
+
+\RequirePackage{tikz}
+	\usetikzlibrary{positioning,external}
+\RequirePackage{xcolor}
+	%\definecolor{headerbox}{HTML/cmyk}{021C2E/0.95,0.39,0.00,0.81}
+	\colorlet{headerbox}{stuttgart1!70!stuttgart2}
+
+\providecommand{\provideemptypages}{\newpage\hbox{}\thispagestyle{empty}}
+
+\RequirePackage[pagestyles,explicit]{titlesec}
+\renewcommand{\heading@format}[1]{\fontsize{35}{48}\titlefamily\bfseries \textcolor{headerbox}{#1}}
+	\newlength{\headingwidth}
+	\newlength{\headingnumberwidth}
+	\newcommand{\kleinbeck@thesis@set@heading}[1]%
+	{%
+		\settowidth{\headingwidth}{\heading@format{#1}}%
+		\settowidth{\headingnumberwidth}{\fontsize{70}{0}\scshape\thechapter}%
+		\addtolength{\headingwidth}{\headingnumberwidth}%
+%
+		\ifdim\headingwidth>\textwidth%
+			\hspace{10pt}\hfill
+			\raggedleft
+			\setlength{\hangindent}{\headingnumberwidth}%
+			\hangafter=1%
+			\heading@format{#1}%
+		\else%
+			\hfill\hfill\heading@format{#1}%
+		\fi
+	}
+	
+\titleformat{\chapter}[block]
+{}
+{\fontsize{70}{0}\tikzset{external/export next=false}%
+	\tikz \node[fill=headerbox,text=white,inner sep=-1pt] at (0,0) {\normalfont\scshape\thechapter};}
+{0pt}{\kleinbeck@thesis@set@heading{#1}}{}%\sffamily
+
+\titleformat{\section}[block]
+{}
+{%
+	\centering%
+	\color{headerbox}%
+	\fontsize{14}{0}\titlefamily\bfseries #1\\\vspace{.2cm}
+	\makebox[\textwidth][c]{\textcolor{headerbox}{\normalfont\scshape\thesection}}
+}%
+{0pt}{}{}%\sffamily
+
+\titleformat{\subsection}[block]
+{}
+{%
+	\color{headerbox}%
+	\fontsize{12}{0}\scshape\thesubsection\hspace{1em}%
+	\titlefamily\bfseries #1%
+}%
+{0pt}{}{}%\sffamily
+
+\ExplSyntaxOn
+\ProvideDocumentEnvironment{abstract}{o}%
+{%
+	\clearpage
+	\begin{center}
+		\fontsize{25}{34}
+		\color{headerbox}\titlefamily\bfseries
+		\IfNoValueTF{#1}%
+		{%
+			Abstract%
+		}
+		{%
+			#1%
+		}
+	\end{center}
+	\par
+}%
+{%
+}
+\ExplSyntaxOff
+
+
+%-----------------------------------------------------------------
+%	Table of Contents
+%-----------------------------------------------------------------
+
+\renewcommand{\contentsname}{\color{stuttgart1}\stuttgartfamily\scshape Contents}
+% Hack such that table of contents is not set in the usual chapter style
+
+\providecommand{\chapter@number@in@toc}[1]%
+{%
+	\tikzset{external/export next=false}%
+	\tikz \node[anchor=east,fill=stuttgart1,text=white,inner sep=0pt,minimum width=1cm] at (0,0) {\scshape #1};%
+}
+\DeclareTOCStyleEntry[indent=0pt,entrynumberformat={},% Flush the chapter number to the left
+					linefill={\\[-.2\baselineskip]\hbox{}\hspace{\dimexpr\textwidth-1.575cm\relax}}, % for whatever fucking
+					% reasons I cannot just substract 1cm, which is the fucking width of the fucking box.
+					entryformat={\color{stuttgart1}\makebox[0pt][l]{\rule[-0.25\baselineskip]{\textwidth}{1pt}}%
+						\stuttgartfamily\large},
+					pagenumberformat={\chapter@number@in@toc}]{tocline}{chapter}
+
+\DeclareTOCStyleEntry[entryformat={\color{stuttgart2!60!stuttgart1}\stuttgartfamily\scshape},%
+					onstarthigherlevel={\vspace{-0.075cm}}, % A little hack for my specific TOC
+					linefill={},
+					raggedentrytext=true,
+					pagenumberformat={\color{stuttgart2!60!stuttgart1}\hspace{1em}/\hspace{1em}}]{tocline}{section}
+
+\DeclareTOCStyleEntry[entryformat={\small\color{stuttgart2!60!stuttgart1}\stuttgartfamily\scshape},%
+					linefill={},
+					raggedentrytext=true,
+					pagenumberformat={\small\color{stuttgart2!60!stuttgart1}\hspace{0.8em}/\hspace{0.8em}}]{tocline}{subsection}
+
+
+%-----------------------------------------------------------------
+%	Title Page
+%-----------------------------------------------------------------
+
+\RequirePackage{booktabs}
+\RequirePackage{colortbl}
+
+\providecommand{\@examinant}{}
+\providecommand{\examinant}[1]
+{
+	\renewcommand{\@examinant}{#1}
+}
+
+\providecommand{\@institute}{}
+\providecommand{\institute}[1]
+{
+	\renewcommand{\@institute}{#1}
+}
+
+\providecommand{\@corrector}{}
+\providecommand{\corrector}[1]
+{
+	\renewcommand{\@corrector}{#1}
+}
+
+\renewcommand{\maketitle}
+{
+	\begin{titlepage}
+		\hbox
+		{
+			\hspace*{0.05\textwidth}
+			\textcolor{stuttgart1}{\rule{2pt}{\textheight}}
+			\hspace*{0.05\textwidth}
+			\parbox[b]{0.85\textwidth}%
+			{
+				\stuttgartfamily
+				\includegraphics[width=0.62\textwidth,height=\textheight,keepaspectratio]%
+					{Pictures/unistuttgart_logo_international}\\[1\baselineskip]
+				
+				{\huge\textsc{\@title}}
+				
+				\vspace{0.07\textheight}
+				\makebox[0.62\textwidth][c]%
+				{%
+					\includegraphics[width=0.52\textwidth,height=\textheight,keepaspectratio]%
+						{Pictures/title_figure_pp}%
+				}
+				\vspace{0.07\textheight}
+
+				\begin{tabular}{@{}lr}
+					\arrayrulecolor{stuttgart1}
+					\toprule
+					Candidate           & \@author \\\midrule
+					Supervisor          & \@examinant \\
+					Secondary Corrector & \@corrector \\
+				\end{tabular}\\[\baselineskip]
+
+				\@institute\\
+				\@date
+				\vspace{0.05\textheight}
+			}
+		}
+	\end{titlepage}
+	\cleardoublepage
+	\setcounter{page}{1}
+}
+
+
+
+%-----------------------------------------------------------------
+%	Figures
+%-----------------------------------------------------------------
+
+\RequirePackage[figureposition=bottom,tableposition=top]{caption}
+	\DeclareCaptionFont{CaptionDefault}{\normalfont\scshape}
+	\captionsetup{format      = plain,
+				labelsep      = newline,
+				font          = small,
+				labelfont     = CaptionDefault,
+				skip          = 12pt,
+				justification = raggedright}
+
+
+%-----------------------------------------------------------------
+%	Theorems
+%-----------------------------------------------------------------
+
+\definecolor{theoremblue}{HTML/cmyk}{336B87/0.62,0.20,0.00,0.47}
+	
+\RequirePackage[xcolor]{mdframed}
+\RequirePackage{amssymb}
+\RequirePackage[amsmath,thmmarks]{ntheorem}
+	\theoremstyle{changebreak}
+	\theoremheaderfont{\scshape\bfseries\color{theoremblue}}
+	\theorembodyfont{\normalfont}
+	\theoremseparator{\smallskip}
+
+\newmdtheoremenv[linecolor = theoremblue,
+		backgroundcolor    = gray!25,
+		leftmargin         = 0pt,
+		innerleftmargin    = 15pt,
+		linewidth          = 2.5pt,
+		topline            = false,
+		rightline          = false,
+		bottomline         = false,
+		leftline           = true,]{theorem}{Theorem}
+
+\newmdtheoremenv[linecolor = theoremblue,
+		backgroundcolor    = gray!25,
+		leftmargin         = 0pt,
+		innerleftmargin    = 15pt,
+		linewidth          = 2.5pt,
+		topline            = false,
+		rightline          = false,
+		bottomline         = false,
+		leftline           = true,]{lemma}{Lemma}
+
+\theoremsymbol{\ensuremath{\textcolor{theoremblue}{\blacksquare}}}
+\theoremstyle{nonumberplain}
+
+\newcounter{proofequation}[chapter]
+\newcounter{equationbackup}[chapter]
+\theoremprework%
+{%
+	\setcounter{equationbackup}{\value{equation}}%
+	\setcounter{equation}{\value{proofequation}}%
+	\renewcommand{\theequation}{\arabic{chapter}.P\arabic{equation}}%
+}
+\theorempostwork%
+{%
+	\setcounter{proofequation}{\value{equation}}%
+	\setcounter{equation}{\value{equationbackup}}%
+}
+\newtheorem{proof}{Proof}
+
+
+%=================================================================
+%=================================================================
+%       Packages
+%=================================================================
+%=================================================================
+
+\ifthesis@draft
+\else
+	\RequirePackage[hidelinks]{hyperref}
+\fi

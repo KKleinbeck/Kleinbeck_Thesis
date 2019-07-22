@@ -1,0 +1,151 @@
+%=================================================================
+%=================================================================
+%       CUSTOM FUNCTIONS
+%=================================================================
+%=================================================================
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{bbm}
+\g@addto@macro\bfseries{\boldmath}
+
+%-----------------------------------------------------------------
+%	Definitions
+%-----------------------------------------------------------------
+
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\erf}{erf}
+\DeclareMathOperator{\re} {Re}
+\DeclareMathOperator{\im} {Im}
+\DeclareMathOperator{\Tr} {Tr}
+\DeclareMathOperator{\Res}{Res}
+
+\providecommand{\hs}{\Theta} % not an math operator snce this does not work well with fontspec
+
+\providecommand{\bbC}{\mathbb{C}}
+\providecommand{\bbN}{\mathbb{N}}
+\providecommand{\bbR}{\mathbb{R}}
+\providecommand{\bbZ}{\mathbb{Z}}
+\providecommand{\id}{\mathbbm{1}}
+
+%-----------------------------------------------------------------
+%	Macros
+%-----------------------------------------------------------------
+
+\DeclareDocumentCommand{\dd}{s o m}%
+{%
+	\IfNoValueTF{#2}
+	{%
+		\mathop{}\!\mathrm{d}#3%
+	}
+	{%
+		\mathop{}\!\mathrm{d}^{#2}#3%
+	}
+	\IfBooleanT{#1}{\,}%
+}
+\DeclareDocumentCommand{\DD}{s o m}%
+{%
+	\IfNoValueTF{#2}
+	{%
+		\mathop{}\!\mathcal{D}\left[#3\right]%
+	}
+	{%
+		\mathop{}\!\mathcal{D}^{#2}\left[#3\right]%
+	}
+	\IfBooleanT{#1}{\,}%
+}
+
+\DeclareDocumentCommand{\Pint}{o o}%
+{%
+	\int%
+	\IfValueT{#1}%
+	{%
+		\limits_{\mathrlap{#1}}
+	}
+	\IfValueT{#2}%
+	{%
+		\limits^{\mathrlap{#2}}
+	}
+}
+
+\ExplSyntaxOn
+\tl_new:N \kdb_temp
+\def\BrKtEnd{}
+\DeclareDocumentCommand{\BrKt}{u\BrKtEnd}%
+{
+    \left.
+    \tl_set:Nn \kdb_temp {#1}
+    \tl_replace_all:Nnn \kdb_temp{<}{\middle\langle}
+    \tl_replace_all:Nnn \kdb_temp{|}{\middle|}
+    \tl_replace_all:Nnn \kdb_temp{>}{\middle\rangle}
+    \tl_use:N \kdb_temp
+    \right.
+}
+
+\DeclareDocumentCommand{\pder}{o m m}
+{
+	\IfNoValueTF{#1}
+	{%
+		\frac{\partial#2}{\partial#3}%
+	}
+	{%
+		\frac{\partial^{#1}#2}{\partial#3^{#1}}%
+	}
+}
+
+\DeclareDocumentCommand{\der}{o m m}
+{
+	\IfNoValueTF{#1}
+	{%
+		\frac{\mathrm{d}#2}{\mathrm{d}#3}%
+	}
+	{%
+		\frac{\mathrm{d}^{#1}#2}{\mathrm{d}#3^{#1}}%
+	}
+}
+\ExplSyntaxOff
+
+\newenvironment{singletag}%
+{%
+	\start@align\@ne\st@rredtrue\m@ne%
+}
+{%
+	\stepcounter{equation}\tag{\theequation}\endalign%
+}
+
+
+%-----------------------------------------------------------------
+%	shortcut notations
+%-----------------------------------------------------------------
+
+\providecommand{\ket}[1]{\BrKt|#1>\BrKtEnd}
+\providecommand{\bra}[1]{\BrKt<#1|\BrKtEnd}
+\providecommand{\kz}{\ket{0}}
+\providecommand{\ko}{\ket{1}}
+\providecommand{\bz}{\bra{0}}
+\providecommand{\bo}{\bra{1}}
+\providecommand{\kPsi}{\ket{\Psi}}
+
+\providecommand{\indx}[1]{\mathrm{#1}}
+\providecommand{\ini}{\indx{i}}
+\providecommand{\inj}{\indx{j}}
+\providecommand{\ink}{\indx{k}}
+\providecommand{\inl}{\indx{l}}
+\providecommand{\inn}{\indx{n}}
+\providecommand{\inm}{\indx{m}}
+
+\providecommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+\providecommand{\conj}[1]{\overbar{#1}}
+
+\ExplSyntaxOn
+\DeclareDocumentCommand{\usb}{s m m}%
+{%
+	\IfBooleanTF{#1}%
+	{%
+		\smash{\underset{#3}{\underbrace{#2}}}
+	}
+	{%
+		\underset{#3}{\underbrace{#2}}
+	}
+}
+\ExplSyntaxOff
