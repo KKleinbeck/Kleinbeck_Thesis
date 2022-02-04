@@ -77,15 +77,22 @@
 		\settowidth{\headingnumberwidth}{\fontsize{70}{0}\scshape\thechapter}%
 		\addtolength{\headingwidth}{\headingnumberwidth}%
 %
-		\ifdim\headingwidth>\textwidth%
-			\hspace{10pt}\hfill
-			\raggedleft
-			\setlength{\hangindent}{\headingnumberwidth}%
-			\hangafter=1%
-			\heading@format{#1}%
-		\else%
-			\hfill\hfill\heading@format{#1}%
-		\fi
+		\IfBooleanTF{#1}%
+		{%
+			\centering%
+			\heading@format{#2}
+		}
+		{%
+			\ifdim\headingwidth>\textwidth%
+				\hspace{10pt}\hfill
+				\raggedleft
+				\setlength{\hangindent}{\headingnumberwidth}%
+				\hangafter=1%
+				\heading@format{#1}%
+			\else%
+				\hfill\hfill\heading@format{#1}%
+			\fi
+		}
 	}
 	
 \titleformat{\chapter}[block]
@@ -93,6 +100,11 @@
 {\fontsize{70}{0}\tikzset{external/export next=false}%
 	\tikz \node[fill=headerbox,text=white,inner sep=-1pt] at (0,0) {\normalfont\scshape\thechapter};}
 {0pt}{\kleinbeck@thesis@set@heading{#1}}{}%\sffamily
+
+\titleformat{name=\chapter, numberless}[block]
+{}
+{}
+{0pt}{\kleinbeck@thesis@set@heading*{#1}}{}%\sffamily
 
 \titleformat{\section}[block]
 {}
