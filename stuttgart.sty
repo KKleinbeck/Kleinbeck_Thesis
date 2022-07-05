@@ -68,51 +68,65 @@
 \providecommand{\provideemptypages}{\newpage\hbox{}\thispagestyle{empty}}
 
 \RequirePackage[pagestyles,explicit]{titlesec}
-\renewcommand{\heading@format}[1]{\fontsize{35}{48}\titlefamily\bfseries \textcolor{headerbox}{#1}}
-	\newlength{\headingwidth}
-	\newlength{\headingnumberwidth}
-	\newcommand{\kleinbeck@thesis@set@heading}[1]%
-	{%
-		\settowidth{\headingwidth}{\heading@format{#1}}%
-		\settowidth{\headingnumberwidth}{\fontsize{70}{0}\scshape\thechapter}%
-		\addtolength{\headingwidth}{\headingnumberwidth}%
+\renewcommand{\heading@format}[1]{\fontsize{30}{41}\titlefamily\bfseries \textcolor{headerbox}{#1}}
+\newlength{\headingwidth}
+\newlength{\headingnumberwidth}
+\ExplSyntaxOn
+\DeclareDocumentCommand{\kleinbeck@thesis@set@heading}{s m}%
+{%
+	\settowidth{\headingwidth}{\heading@format{#1}}%
+	\settowidth{\headingnumberwidth}{\fontsize{70}{0}\scshape\thechapter}%
+	\addtolength{\headingwidth}{\headingnumberwidth}%
 %
-		\IfBooleanTF{#1}%
-		{%
-			\centering%
-			\heading@format{#2}
-		}
-		{%
-			\ifdim\headingwidth>\textwidth%
-				\hspace{10pt}\hfill
-				\raggedleft
-				\setlength{\hangindent}{\headingnumberwidth}%
-				\hangafter=1%
-				\heading@format{#1}%
-			\else%
-				\hfill\hfill\heading@format{#1}%
-			\fi
-		}
+	\IfBooleanTF{#1}%
+	{%
+		\raggedleft%
+		\heading@format{#2}
 	}
+	{%
+		\ifdim\headingwidth>\textwidth%
+			\hspace{10pt}\hfill
+			\raggedleft
+			\setlength{\hangindent}{\headingnumberwidth}%
+			\hangafter=1%
+			\heading@format{#2}%
+		\else%
+			\hfill\hfill\heading@format{#2}%
+		\fi
+	}
+}
+\ExplSyntaxOff
 	
-\titleformat{\chapter}[block]
-{}
-{\fontsize{70}{0}\tikzset{external/export next=false}%
-	\tikz \node[fill=headerbox,text=white,inner sep=-1pt] at (0,0) {\normalfont\scshape\thechapter};}
-{0pt}{\kleinbeck@thesis@set@heading{#1}}{}%\sffamily
+\titleformat{name=\chapter}[block]
+{}% Format for the entire title
+{}{0pt}
+{%
+	\fontsize{70}{0}\tikzset{external/export next=false}%
+	\tikz \node[fill=headerbox,text=white,inner sep=-1pt] at (0,0) {\normalfont\scshape\thechapter};%
+	\kleinbeck@thesis@set@heading{#1}%
+}{}%\sffamily
 
-\titleformat{name=\chapter, numberless}[block]
+\titleformat{name=\chapter,numberless}[block]
 {}
 {}
 {0pt}{\kleinbeck@thesis@set@heading*{#1}}{}%\sffamily
 
-\titleformat{\section}[block]
+\titleformat{name=\section}[block]
 {}
 {%
 	\centering%
 	\color{headerbox}%
 	\fontsize{14}{0}\titlefamily\bfseries #1\\\vspace{.2cm}
 	\makebox[\textwidth][c]{\textcolor{headerbox}{\normalfont\scshape\thesection}}
+}%
+{0pt}{}{}%\sffamily
+
+\titleformat{name=\section,numberless}[block]
+{}
+{%
+	\centering%
+	\color{headerbox}%
+	\fontsize{14}{0}\titlefamily\bfseries #1\\\vspace{.2cm}
 }%
 {0pt}{}{}%\sffamily
 
@@ -156,26 +170,42 @@
 
 \providecommand{\chapter@number@in@toc}[1]%
 {%
-	\tikzset{external/export next=false}%
-	\tikz \node[anchor=east,fill=stuttgart1,text=white,inner sep=0pt,minimum width=1cm] at (0,0) {\scshape #1};%
+	\hspace{-2em} % remove the num width indent
+	\hspace{-5pt} % remove magic latex nonsense width
+	\makebox[\textwidth][r]{%
+		\tikzset{external/export next=false}%
+		\tikz \node[fill=stuttgart1,text=white,inner sep=1pt,minimum width=1cm]
+			at (0,0) {\scshape #1};%
+	}
 }
-\DeclareTOCStyleEntry[indent=0pt,entrynumberformat={},% Flush the chapter number to the left
-					linefill={\\[-.2\baselineskip]\hbox{}\hspace{\dimexpr\textwidth-1.575cm\relax}}, % for whatever fucking
-					% reasons I cannot just substract 1cm, which is the fucking width of the fucking box.
-					entryformat={\color{stuttgart1}\makebox[0pt][l]{\rule[-0.25\baselineskip]{\textwidth}{1pt}}%
-						\stuttgartfamily\large},
-					pagenumberformat={\chapter@number@in@toc}]{tocline}{chapter}
+
+\DeclareTOCStyleEntry[numwidth=2em,indent=0pt,dynnumwidth=false,numsep=0pt,
+				entrynumberformat={},% Flush the chapter number to the left
+				entryformat={%
+					\color{stuttgart1}%
+					\makebox[0pt][l]{\rule[-0.4\baselineskip]{\textwidth}{1pt}}%
+					\stuttgartfamily\large%
+				},%
+				linefill={\\[-.4\baselineskip]},%
+				pagenumberformat={\chapter@number@in@toc}%
+			]{tocline}{chapter}
 
 \DeclareTOCStyleEntry[entryformat={\color{stuttgart2!60!stuttgart1}\stuttgartfamily\scshape},%
-					onstarthigherlevel={\vspace{-0.075cm}}, % A little hack for my specific TOC
-					linefill={},
-					raggedentrytext=true,
-					pagenumberformat={\color{stuttgart2!60!stuttgart1}\hspace{1em}/\hspace{1em}}]{tocline}{section}
+				onstarthigherlevel={\vspace{-0.075cm}}, % A little hack for my specific TOC
+				linefill={},%
+				raggedentrytext=true,%
+				pagenumberformat={%
+					\color{stuttgart2!60!stuttgart1}\hspace{1em}/\hspace{1em}%
+				}%
+			]{tocline}{section}
 
 \DeclareTOCStyleEntry[entryformat={\small\color{stuttgart2!60!stuttgart1}\stuttgartfamily\scshape},%
-					linefill={},
-					raggedentrytext=true,
-					pagenumberformat={\small\color{stuttgart2!60!stuttgart1}\hspace{0.8em}/\hspace{0.8em}}]{tocline}{subsection}
+				linefill={},%
+				raggedentrytext=true,%
+				pagenumberformat={%
+					\small\color{stuttgart2!60!stuttgart1}\hspace{0.8em}/\hspace{0.8em}%
+				}%
+			]{tocline}{subsection}
 
 
 %-----------------------------------------------------------------
@@ -203,43 +233,43 @@
 	\renewcommand{\@corrector}{#1}
 }
 
+\providecommand{\@examinationdate}{}
+\providecommand{\examinationdate}[1]
+{
+	\renewcommand{\@examinationdate}{#1}
+}
+
 \renewcommand{\maketitle}
 {
 	\begin{titlepage}
-		\hbox
+		\hfill\includegraphics[width=0.45\textwidth,height=\textheight,keepaspectratio]%
+			{unistuttgart_logo_international}\\[1\baselineskip]
+			
+		\centering
+		\stuttgartfamily
+		{\huge\textbf{\@title}}
+		\vspace{1.75cm}
+
+		\parbox{0.87\textwidth}%
 		{
-			\hspace*{0.05\textwidth}
-			\textcolor{stuttgart1}{\rule{2pt}{\textheight}}
-			\hspace*{0.05\textwidth}
-			\parbox[b]{0.85\textwidth}%
-			{
-				\stuttgartfamily
-				\includegraphics[width=0.62\textwidth,height=\textheight,keepaspectratio]%
-					{Pictures/unistuttgart_logo_international}\\[1\baselineskip]
-				
-				{\huge\textsc{\@title}}
-				
-				\vspace{0.07\textheight}
-				\makebox[0.62\textwidth][c]%
-				{%
-					\includegraphics[width=0.52\textwidth,height=\textheight,keepaspectratio]%
-						{Pictures/title_figure_pp}%
-				}
-				\vspace{0.07\textheight}
-
-				\begin{tabular}{@{}lr}
-					\arrayrulecolor{stuttgart1}
-					\toprule
-					Candidate           & \@author \\\midrule
-					Supervisor          & \@examinant \\
-					Secondary Corrector & \@corrector \\
-				\end{tabular}\\[\baselineskip]
-
-				\@institute\\
-				\@date
-				\vspace{0.05\textheight}
-			}
+			Von der Fakultät Mathematik und Physik der Universität Stuttgart zur Erlangung der Würde eines Doktors der Naturwissenschaften (Dr. rer. nat.) genehmigte Abhandlung.
 		}
+
+		\vspace{1.5cm}
+		Vorgelegt von\\
+		{\Large\textbf{\@author}}\\
+		aus Stuttgart.
+		
+		\vspace{1cm}
+		\begin{tabular}{@{}lr}
+			Hauptberichter             & \@examinant \\
+			Mitberichter               & \@corrector \\[0.5cm]
+			Tag der mündlichen Prüfung & \@examinationdate
+		\end{tabular}\\[\baselineskip]
+
+		\vfill
+		\@institute\\
+		\@date
 	\end{titlepage}
 	\cleardoublepage
 	\setcounter{page}{1}
